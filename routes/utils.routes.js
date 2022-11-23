@@ -4,14 +4,12 @@ const express = require("express");
 const path = require("path");
 
 // controller
-const auth = require("../controllers/auth.controller");
+const utils = require("../controllers/utils.controller");
 
 // Stuff
 const router = express.Router();
 
 // Routes
-router.get("/ping", auth.getPingController);
-router.post("/register", auth.postRegisterController);
-router.post("/login", auth.postLoginController);
+router.get("/ping", utils.getPingController);
 
 module.exports = router;

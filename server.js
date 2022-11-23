@@ -8,7 +8,8 @@ const cors = require("cors");
 
 // ENV Variables
 const port = process.env.PORT;
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.ATLAS;
+// const MONGODB_URI = process.env.COMPASS;
 
 // Don't ask
 const app = express();

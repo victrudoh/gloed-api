@@ -60,4 +60,34 @@ module.exports = {
       });
     }
   },
+
+  //   GEt all upcoming sessions
+  getScheduleController: async (req, res) => {
+    try {
+      const today = Date.now();
+      const formatDate = new Date(today);
+      console.log(
+        "🚀 ~ file: utils.controller.js ~ line 69 ~ getScheduleController: ~ formatDate",
+        formatDate
+      );
+
+      const { userId } = req.query;
+      const sessions = await Session.find({
+        userId: userId,
+        dateTime: { $gte: formatDate },
+      });
+
+      return res.status(200).send({
+        success: true,
+        length: sessions.length,
+        message: "Fetched schedule successfully",
+        sessions: sessions,
+      });
+    } catch (err) {
+      return res.status(500).send({
+        success: false,
+        message: err.message,
+      });
+    }
+  },
 };

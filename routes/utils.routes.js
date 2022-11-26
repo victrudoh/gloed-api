@@ -12,5 +12,6 @@ const router = express.Router();
 // Routes
 router.get("/ping", utils.getPingController);
 router.post("/session/book", utils.getBookSessionController);
+router.get("/session/schedule", utils.getScheduleController);
 
 module.exports = router;

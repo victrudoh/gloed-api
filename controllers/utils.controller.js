@@ -21,11 +21,11 @@ module.exports = {
   },
 
   // Book a session
-  getBookSessionController: async (req, res) => {
+  postBookSessionController: async (req, res) => {
     try {
       const { userId } = req.query;
 
-      const { course, type, dateTime } = req.body;
+      const { course, type, comment, dateTime } = req.body;
 
       // const sessionConflict = await Session.findOne({
       //   userId: userId,
@@ -43,6 +43,7 @@ module.exports = {
         userId,
         course,
         type,
+        comment,
         dateTime: new Date(dateTime),
       });
       await newSession.save();

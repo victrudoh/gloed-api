@@ -27,7 +27,7 @@ module.exports = {
         try {
             const { userId } = req.query;
 
-            const { course, type, comment, dateTime } = req.body;
+            const { course, type, comment, meetingType, dateTime } = req.body;
 
             // const sessionConflict = await Session.findOne({
             //   userId: userId,
@@ -46,6 +46,7 @@ module.exports = {
                 course,
                 type,
                 comment,
+                meetingType,
                 dateTime: new Date(dateTime),
             });
             await newSession.save();

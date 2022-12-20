@@ -23,6 +23,10 @@ const sessionSchema = new Schema(
       type: String,
       required: true,
     },
+    meetingType: {
+      type: String,
+      required: true,
+    },
     dateTime: {
       type: Date,
       required: true,

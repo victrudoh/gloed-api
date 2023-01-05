@@ -12,6 +12,7 @@ const router = express.Router();
 // Routes
 router.get("/ping", utils.getPingController);
 router.post("/session/book", utils.postBookSessionController);
+router.get("/session/verify-payment", utils.getVerifyController);
 router.get("/session/schedule", utils.getScheduleController);
 
 module.exports = router;

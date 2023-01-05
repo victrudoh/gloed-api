@@ -3,12 +3,12 @@ const Joi = require("@hapi/joi");
 
 //  Validation
 const signUpValidation = Joi.object({
-    // firstName: Joi.string().min(2).required(),
-    // lastName: Joi.string().min(2).required(),
+    firstName: Joi.string().min(2).required(),
+    lastName: Joi.string().min(2).required(),
     // userName: Joi.string().min(4).required(),
-    fullname: Joi.string().min(4).required(),
+    // fullname: Joi.string().min(4).required(),
     email: Joi.string().min(6).required().email(),
-    // phone: Joi.string().min(11).required(),
+    phone: Joi.string().min(5).required(),
     password: Joi.string().min(4).required(),
     role: Joi.string().min(4),
     // media: Joi.string().required(),

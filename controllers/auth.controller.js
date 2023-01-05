@@ -38,7 +38,8 @@ module.exports = {
         try {
             // const { firstName, lastName, username, email, phone, password, media } =
             //   req.body;
-            const { fullname, email, password } = req.body;
+            // const { fullname, email, password } = req.body;
+            const { firstName, lastName, email, phone, password } = req.body;
 
             // const body = { ...req.body, media: req.file };
 
@@ -60,8 +61,10 @@ module.exports = {
 
             // create user
             const user = new User({
-                fullname,
+                firstName,
+                lastName,
                 email,
+                phone,
                 password: hashedPassword,
             });
             await user.save();
@@ -79,7 +82,7 @@ module.exports = {
                     };
 
                     sendMail(mailOptions);
-                })
+                });
             }
 
             // Send password to admin's email
@@ -128,6 +131,9 @@ module.exports = {
             //   Generate JWT Token
             const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
+            // console.log("postLoginController:async ~ token", token);
+            // console.log("postLoginController:async ~ user", user);
+
             return res.status(200).send({
                 success: true,
                 data: {
@@ -137,6 +143,10 @@ module.exports = {
                 message: "Login successful",
             });
         } catch (err) {
+            console.log(
+                "🚀 ~ file: auth.controller.js:143 ~ postLoginController:async ~ err",
+                err
+            );
             return res.status(500).send({
                 success: false,
                 errMessage: err.message,

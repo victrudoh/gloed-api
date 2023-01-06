@@ -1,5 +1,3 @@
-const userModel = require("../models/user.model");
-
 const resetPasswordMail = (user, course, date) => {
     return `
        
@@ -355,14 +353,14 @@ ul.social li{
                   
             		<td>
             			<div class="text" style="padding: 0 2.5em; text-align: left;">
-							<h3>Hi <b>${userModel}</b>,
+							<h3>Hi <b>${user}</b>,
 							</h3>					
 							<h4>You successfully booked a session on Gloed, the session - <b>${course}</b> was booked for <b>${date}</b>. </4>
 							<br> 
-							<h4> head to your dashboard to see your course schedule </h4>
+							<h4> Head to your dashboard to see your course schedule </h4>
 							<br><br>
 						
-							<p>if you didn't initiate this request, please ignore this mail, or contact Admin for further support</p>
+							<p>If you didn't initiate this request, please ignore this mail, or contact Admin for further support</p>
             			</div>
             		</td>
             	</tr>

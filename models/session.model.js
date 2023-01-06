@@ -28,11 +28,11 @@ const sessionSchema = new Schema({
     },
     tx_ref: {
         type: Number,
-        required: true,
+        // required: true,
     },
     amount: {
         type: Number,
-        required: true,
+        // required: true,
     },
     paid: {
         type: Boolean,

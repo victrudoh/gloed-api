@@ -31,8 +31,82 @@ module.exports = {
         }
     },
 
-    // Book a session
-    postBookSessionController: async(req, res) => {
+    // Book a Free session
+    postBookFreeSessionController: async(req, res) => {
+        try {
+            const { userId } = req.query;
+
+            // find user
+            const user = await User.findById({ _id: userId });
+            if (!user) return res.status(400).send("User not found");
+
+            const { course, type, comment, meetingType, dateTime } = req.body;
+
+            const newSession = new Session({
+                userId,
+                course,
+                type,
+                comment,
+                meetingType,
+                dateTime: new Date(dateTime),
+            });
+            await newSession.save();
+
+            // Find all admins
+            const admins = await User.find({ role: "admin" });
+
+            //   send mail to all admins
+            if (admins) {
+                admins.map((admin) => {
+                    // Send password to admin's email
+                    const mailOptions = {
+                        to: admin.email,
+                        subject: "New Session Mail",
+                        html: adminPaidSessionMail(
+                            user.firstName,
+                            newSession.course,
+                            newSession.dateTime,
+                            admin.firstName
+                        ),
+                    };
+                    sendMail(mailOptions);
+                });
+            }
+
+            // Send password to user's email
+            const mailOptions = {
+                to: user.email,
+                subject: "New Session Mail",
+                html: userPaidSessionMail(
+                    user.firstName,
+                    newSession.course,
+                    newSession.dateTime
+                ),
+            };
+            sendMail(mailOptions);
+
+            return res.status(200).send({
+                success: true,
+                message: "created new sesssion successfully",
+                data: {
+                    session: newSession,
+                },
+            });
+        } catch (err) {
+            console.log(
+                "🚀 ~ file: utils.controller.js:87 ~ postBookSessionController:async ~ err",
+                err
+            );
+            return res.status(500).send({
+                success: false,
+                message: "Couldn't create session",
+                errMessage: err.message,
+            });
+        }
+    },
+
+    // Book a paid session
+    postBookPaidSessionController: async(req, res) => {
         try {
             const { userId } = req.query;
             console.log("postBookSessionController:async ~ userId", userId);

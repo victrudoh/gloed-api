@@ -357,10 +357,10 @@ ul.social li{
 							</h3>					
 							<h4>A user - <b>${user}</b> just successfully booked a session on Gloed, the session - <b>${course}</b> was booked for <b>${date}</b>. </4>
 							<br> 
-							<h4> head over to your dashboard to see more. </h4>
+							<h4> Head over to your dashboard to see more. </h4>
 							<br><br>
 						
-							<p>if you didn't initiate this request, please ignore this mail, or contact Admin for further support</p>
+							<p>If you didn't initiate this request, please ignore this mail, or contact Admin for further support</p>
             			</div>
             		</td>
             	</tr>

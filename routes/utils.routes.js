@@ -11,7 +11,8 @@ const router = express.Router();
 
 // Routes
 router.get("/ping", utils.getPingController);
-router.post("/session/book", utils.postBookSessionController);
+router.post("/session/book-free", utils.postBookFreeSessionController);
+router.post("/session/book-paid", utils.postBookPaidSessionController);
 router.get("/session/verify-payment", utils.getVerifyController);
 router.get("/session/schedule", utils.getScheduleController);
 

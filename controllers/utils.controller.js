@@ -3,6 +3,7 @@
 // Models
 const User = require("../models/user.model");
 const Session = require("../models/session.model");
+const WebSession = require("../models/webSession.model");
 
 // middlewares
 const tx_ref = require("../middlewares/tx_ref");
@@ -342,6 +343,250 @@ module.exports = {
             return res.status(500).send({
                 success: false,
                 message: err.message,
+            });
+        }
+    },
+
+    //   ********
+    //   ********
+    //   ********
+    //   ********
+    // Endpoints without User verification (UNAUTH)
+    //   ********
+    //   ********
+    //   ********
+    //   ********
+
+    // Book a Free session
+    postBookFreeUnauthSessionController: async(req, res) => {
+        try {
+            const {
+                fullName,
+                email,
+                phone,
+                course,
+                type,
+                comment,
+                meetingType,
+                dateTime,
+            } = req.body;
+
+            const newSession = new WebSession({
+                fullName,
+                email,
+                phone,
+                course,
+                type,
+                comment,
+                meetingType,
+                dateTime: new Date(dateTime),
+            });
+            await newSession.save();
+
+            // Find all admins
+            const admins = await User.find({ role: "admin" });
+
+            //   send mail to all admins
+            if (admins) {
+                admins.map((admin) => {
+                    // Send password to admin's email
+                    const mailOptions = {
+                        to: admin.email,
+                        subject: "New Session Mail",
+                        html: adminPaidSessionMail(
+                            newSession.fullName,
+                            newSession.course,
+                            newSession.dateTime,
+                            admin.firstName
+                        ),
+                    };
+                    sendMail(mailOptions);
+                });
+            }
+
+            // Send password to user's email
+            const mailOptions = {
+                to: email,
+                subject: "New Session Mail",
+                html: userPaidSessionMail(
+                    newSession.fullName,
+                    newSession.course,
+                    newSession.dateTime
+                ),
+            };
+            sendMail(mailOptions);
+
+            return res.status(200).send({
+                success: true,
+                message: "created new sesssion successfully",
+                data: {
+                    session: newSession,
+                },
+            });
+        } catch (err) {
+            console.log(
+                "🚀 ~ file: utils.controller.js:87 ~ postBookSessionController:async ~ err",
+                err
+            );
+            return res.status(500).send({
+                success: false,
+                message: "Couldn't create session",
+                errMessage: err.message,
+            });
+        }
+    },
+
+    // Book a paid session
+    postBookPaidUnauthSessionController: async(req, res) => {
+        try {
+            const {
+                fullName,
+                email,
+                phone,
+                amount,
+                course,
+                type,
+                comment,
+                meetingType,
+                dateTime,
+            } = req.body;
+
+            const currency = "NGN";
+            const newAmount = parseInt(req.body.amount);
+            const transREf = tx_ref.get_Tx_Ref();
+
+            const payload = {
+                tx_ref: transREf,
+                amount: newAmount,
+                currency: currency,
+                payment_options: "card",
+                redirect_url: "https://topapp.ng/utility/verify",
+                customer: {
+                    email: email,
+                    phonenumber: phone,
+                    name: fullName,
+                },
+                meta: {
+                    customer_id: transREf,
+                },
+                customizations: {
+                    title: "Gloed",
+                    description: "Pay with card",
+                    logo: "#",
+                },
+            };
+
+            const newSession = new WebSession({
+                fullName,
+                email,
+                phone,
+                course,
+                type,
+                comment,
+                meetingType,
+                tx_ref: transREf,
+                amount,
+                dateTime: new Date(dateTime),
+            });
+            await newSession.save();
+
+            const response = await FLW_services.initiateTransaction(payload);
+
+            return res.status(200).send({
+                success: true,
+                message: "created new sesssion successfully",
+                data: {
+                    session: newSession,
+                    url: response,
+                },
+            });
+        } catch (err) {
+            console.log(
+                "🚀 ~ file: utils.controller.js:87 ~ postBookSessionController:async ~ err",
+                err
+            );
+            return res.status(500).send({
+                success: false,
+                message: "Couldn't create session",
+                errMessage: err.message,
+            });
+        }
+    },
+
+    // Verify payment
+    getVerifyUnauthController: async(req, res, next) => {
+        try {
+            const id = req.query.transaction_id;
+            const tx_ref = req.query.tx_ref;
+
+            const verify = await FLW_services.verifyTransaction(id);
+            console.log("getVerifyController:async ~ verify", verify);
+
+            if (verify.status === "successful") {
+                const session = await WebSession.findOne({ tx_ref: tx_ref });
+                console.log("session: ", session);
+
+                if (session) {
+                    session.paid = true;
+                    await session.save();
+
+                    // Find all admins
+                    const admins = await User.find({ role: "admin" });
+
+                    //   send mail to all admins
+                    if (admins) {
+                        admins.map((admin) => {
+                            const mailOptions = {
+                                to: admin.email,
+                                subject: "New Session Mail",
+                                html: adminPaidSessionMail(
+                                    session.fullName,
+                                    session.course,
+                                    session.dateTime,
+                                    admin.firstName
+                                ),
+                            };
+                            sendMail(mailOptions);
+                        });
+                    }
+
+                    // Send mail to user
+                    const mailOptions = {
+                        to: session.email,
+                        subject: "New Session Mail",
+                        html: adminPaidSessionMail(
+                            session.fullName,
+                            session.course,
+                            session.dateTime
+                        ),
+                    };
+                    sendMail(mailOptions);
+
+                    return res.status(200).send({
+                        success: true,
+                        data: {
+                            session,
+                        },
+                        message: "transaction successful",
+                    });
+                } else {
+                    res.status(400).send({
+                        success: false,
+                        message: makePayment.data.response_description,
+                    });
+                }
+            } else {
+                res.status(500).send({
+                    success: false,
+                    message: "Payment was not successful",
+                });
+            }
+        } catch (err) {
+            console.log("EERROOOORR: ", err);
+            res.status(500).send({
+                success: false,
+                message: "Oops! Something is wrong",
+                errMessage: err.message,
             });
         }
     },

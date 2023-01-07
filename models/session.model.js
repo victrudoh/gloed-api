@@ -20,7 +20,7 @@ const sessionSchema = new Schema({
     },
     comment: {
         type: String,
-        required: true,
+        // required: true,
     },
     meetingType: {
         type: String,

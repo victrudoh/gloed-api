@@ -47,6 +47,7 @@ module.exports = {
                 userId,
                 course,
                 type,
+                amount: 0,
                 comment,
                 meetingType,
                 dateTime: new Date(dateTime),
@@ -374,6 +375,7 @@ module.exports = {
             const newSession = new WebSession({
                 fullName,
                 email,
+                amount: 0,
                 phone,
                 course,
                 type,

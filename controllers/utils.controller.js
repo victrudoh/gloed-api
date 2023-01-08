@@ -381,7 +381,8 @@ module.exports = {
                 type,
                 comment,
                 meetingType,
-                dateTime: new Date(dateTime),
+                // dateTime: new Date(dateTime),
+                dateTime,
             });
             await newSession.save();
 
@@ -488,7 +489,8 @@ module.exports = {
                 meetingType,
                 tx_ref: transREf,
                 amount,
-                dateTime: new Date(dateTime),
+                // dateTime: new Date(dateTime),
+                dateTime,
             });
             await newSession.save();
 

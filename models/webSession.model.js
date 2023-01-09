@@ -47,7 +47,7 @@ const webSessionSchema = new Schema({
         default: false,
     },
     dateTime: {
-        type: String,
+        type: String || Date,
         required: true,
     },
     // dateTime: {

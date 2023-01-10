@@ -23,7 +23,7 @@ const sessionSchema = new Schema({
         // required: true,
     },
     meetingType: {
-        type: String,
+        type: Boolean,
         required: true,
     },
     tx_ref: {

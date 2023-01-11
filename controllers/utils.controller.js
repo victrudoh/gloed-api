@@ -294,7 +294,7 @@ module.exports = {
                 } else {
                     res.status(400).send({
                         success: false,
-                        message: makePayment.data.response_description,
+                        message: "Couldn't find session",
                     });
                 }
             } else {
@@ -524,7 +524,7 @@ module.exports = {
             const tx_ref = req.query.tx_ref;
 
             const verify = await FLW_services.verifyTransaction(id);
-            console.log("getVerifyController:async ~ verify", verify);
+            console.log("getVerifyController:async ~ verify:", verify);
 
             if (verify.status === "successful") {
                 const session = await WebSession.findOne({ tx_ref: tx_ref });
@@ -576,7 +576,7 @@ module.exports = {
                 } else {
                     res.status(400).send({
                         success: false,
-                        message: makePayment.data.response_description,
+                        message: "Couldn't find session",
                     });
                 }
             } else {

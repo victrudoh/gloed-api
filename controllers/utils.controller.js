@@ -463,7 +463,7 @@ module.exports = {
                 amount: newAmount,
                 currency: currency,
                 payment_options: "card",
-                redirect_url: "https://topapp.ng/utility/verify",
+                redirect_url: "http://localhost:3001/payment-status",
                 customer: {
                     email: email,
                     phonenumber: phone,

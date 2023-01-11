@@ -31,7 +31,7 @@ const webSessionSchema = new Schema({
         // required: true,
     },
     meetingType: {
-        type: Boolean,
+        type: String,
         required: true,
     },
     tx_ref: {

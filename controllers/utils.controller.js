@@ -548,7 +548,7 @@ module.exports = {
                                     session.fullName,
                                     session.course,
                                     session.dateTime,
-                                    admin.firstName
+                                    admin.fullName
                                 ),
                             };
                             sendMail(mailOptions);

@@ -464,7 +464,7 @@ module.exports = {
                 currency: currency,
                 payment_options: "card",
                 // redirect_url: "http://localhost:3000/payment-status",
-                redirect_url: "https://www.gloed.co/payment-status",
+                redirect_url: "https://www.gloed.co/#/payment-status",
                 customer: {
                     email: email,
                     phonenumber: phone,

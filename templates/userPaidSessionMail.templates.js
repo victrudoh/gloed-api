@@ -355,9 +355,13 @@ ul.social li{
             			<div class="text" style="padding: 0 2.5em; text-align: left;">
 							<h3>Hi <b>${user}</b>,
 							</h3>					
-							<h4>You successfully booked a session on Gloed, the session - <b>${course}</b> was booked for <b>${date}</b>. </4>
+							<h4>You successfully booked a session on Gloed, the session.</h4>
+							<br>
+							<b>Class: </b> ${course} 
+							<br>
+							<b>Date/Time: </b>${date}
 							<br> 
-							<h4> Head to your dashboard to see your course schedule </h4>
+							<h4> Best Regards,</h4>
 							<br><br>
 						
 							<p>If you didn't initiate this request, please ignore this mail, or contact Admin for further support</p>

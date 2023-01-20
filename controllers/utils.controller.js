@@ -543,7 +543,7 @@ module.exports = {
                         admins.map((admin) => {
                             const mailOptions = {
                                 to: admin.email,
-                                subject: "New Session Mail",
+                                subject: "Gloed Session Booking",
                                 html: adminPaidSessionMail(
                                     session.fullName,
                                     session.course,
@@ -558,7 +558,7 @@ module.exports = {
                     // Send mail to user
                     const mailOptions = {
                         to: session.email,
-                        subject: "New Session Mail",
+                        subject: "Gloed Session Booking",
                         html: adminPaidSessionMail(
                             session.fullName,
                             session.course,

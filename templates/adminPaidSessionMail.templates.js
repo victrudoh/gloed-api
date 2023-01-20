@@ -343,7 +343,7 @@ ul.social li{
             <table>
 				<tr>
 					<div class="text" style="padding: 0 0 0.5em 0; padding-top: 2rem; text-align: center;">
-						<h2>New Booking mail</h2>
+						<h2>Gloed Session Booking</h2>
 					</div>
 				</tr>
                    <!-- <tr> 
@@ -353,11 +353,14 @@ ul.social li{
                   
             		<td>
             			<div class="text" style="padding: 0 2.5em; text-align: left;">
-							<h3>Hi <b>${admin}</b>,
-							</h3>					
-							<h4>A user - <b>${user}</b> just successfully booked a session on Gloed, the session - <b>${course}</b> was booked for <b>${date}</b>. </4>
+							<h3>Hi <b>${admin}</b>,</h3>					
+							<h4>A user - <b>${user}</b> just successfully booked a session on Gloed. </h4>
+							<br>
+							<b>Class: </b> ${course} 
+							<br>
+							<b>Date/Time: </b>${date}
 							<br> 
-							<h4> Head over to your dashboard to see more. </h4>
+							<h4> Best Regards,</h4>
 							<br><br>
 						
 							<p>If you didn't initiate this request, please ignore this mail, or contact Admin for further support</p>

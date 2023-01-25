@@ -359,12 +359,10 @@ ul.social li{
 							<br>
 							<b>Class: </b> ${course} 
 							<br>
-							<b>Date/Time: </b>${date}
-							<br> 
-							<h4> Best Regards,</h4>
+							<b>Date/Time: </b>${date.splice(0, 12)}
 							<br><br>
-						
-							<p>If you didn't initiate this request, please ignore this mail, or contact Admin for further support</p>
+							<h4> Best Regards, Team Gloed</h4>
+							<br><br>
             			</div>
             		</td>
             	</tr>

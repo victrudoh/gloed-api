@@ -359,11 +359,9 @@ ul.social li{
 							<b>Class: </b> ${course} 
 							<br>
 							<b>Date/Time: </b>${date}
-							<br> 
-							<h4> Best Regards,</h4>
-							<br><br>
-						
-							<p>If you didn't initiate this request, please ignore this mail, or contact Admin for further support</p>
+							<br><br>						
+							<h4> Best Regards, Team Gloed</h4>
+							<br><br>						
             			</div>
             		</td>
             	</tr>

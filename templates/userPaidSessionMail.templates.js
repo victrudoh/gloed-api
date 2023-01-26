@@ -357,12 +357,11 @@ ul.social li{
 							</h3>					
 							<h4>You successfully booked a session on Gloed, the session.</h4>
 							<br>
-							<b>Class: </b> ${course} 
-							<br>
-							<b>Date/Time: </b>${date}
-							<br><br>
-							<h4> Best Regards, Team Gloed</h4>
-							<br><br>
+							<h4><b>Class: </b> ${course} </h4>
+							<h4><b>Date/Time: </b>${date}</h4>
+							<br><br>						
+							<h4> Best Regards, <br /> Team Gloed.</h4>
+							<br><br>			
             			</div>
             		</td>
             	</tr>

@@ -154,4 +154,66 @@ module.exports = {
             });
         }
     },
+
+    // Make admin
+    getMakeAdminController: async(req, res, next) => {
+        try {
+            const { id } = req.query;
+
+            //   check if user exist
+            const user = await User.findOne({ _id: id });
+            if (!user) return res.status(400).send("User not found");
+
+            user.role = "admin";
+            await user.save();
+
+            return res.status(200).send({
+                success: true,
+                data: {
+                    user: user,
+                },
+                message: `User: ${user.firstName} is now an admin`,
+            });
+        } catch (err) {
+            console.log(
+                "🚀 ~ file: auth.controller.js:178 ~ getMakeAdminController:async ~ err",
+                err
+            );
+            res.status(500).send({
+                success: false,
+                errMessage: err.message,
+                message: "Couldn't switch user role",
+            });
+        }
+    },
+
+    // USer profile
+    getUserProfileController: async(req, res, next) => {
+        try {
+            const { id } = req.query;
+
+            //   check if user exist
+            const user = await User.findOne({ _id: id });
+            if (!user) return res.status(400).send("User not found");
+
+            return res.status(200).send({
+                success: true,
+                data: {
+                    user: user,
+                },
+                message: `Found user - ${user.firstName}`,
+            });
+        } catch (err) {
+            console.log(
+                "🚀 ~ file: auth.controller.js:207 ~ getOneUserController:async ~ err",
+                err
+            );
+
+            res.status(500).send({
+                success: false,
+                errMessage: err.message,
+                message: "Couldn't fetch user",
+            });
+        }
+    },
 };

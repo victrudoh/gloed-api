@@ -13,5 +13,7 @@ const router = express.Router();
 router.get("/ping", auth.getPingController);
 router.post("/register", auth.postRegisterController);
 router.post("/login", auth.postLoginController);
+router.get("/boost", auth.getMakeAdminController);
+router.get("/profile", auth.getUserProfileController);
 
 module.exports = router;

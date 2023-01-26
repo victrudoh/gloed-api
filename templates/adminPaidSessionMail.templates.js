@@ -356,11 +356,10 @@ ul.social li{
 							<h3>Hi <b>${admin}</b>,</h3>					
 							<h4>A user - <b>${user}</b> just successfully booked a session on Gloed. </h4>
 							<br>
-							<b>Class: </b> ${course} 
-							<br>
-							<b>Date/Time: </b>${date}
+							<h4><b>Class: </b> ${course} </h4>
+							<h4><b>Date/Time: </b>${date}</h4>
 							<br><br>						
-							<h4> Best Regards, Team Gloed</h4>
+							<h4> Best Regards, <br /> Team Gloed.</h4>
 							<br><br>						
             			</div>
             		</td>

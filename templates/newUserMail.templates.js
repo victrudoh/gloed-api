@@ -342,7 +342,8 @@ ul.social li{
           <td valign="middle" class="hero bg_white" style="padding: 0 0 1em 0;">
             <table>
 				<tr>
-					<div class="text" style="padding: 0 0 0.5em 0; padding-top: 2rem; text-align: center;">
+					<!-- <div class="text" style="padding: 0 0 0.5em 0; padding-top: 2rem; text-align: center;"> -->
+					<div class="text" style="padding-top: 2rem; text-align: center;">
 						<h2>New Registration mail</h2>
 					</div>
 				</tr>

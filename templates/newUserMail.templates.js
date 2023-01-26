@@ -360,9 +360,7 @@ ul.social li{
 								click on the link to view the user profile.
 								<a href="${process.env.APP_URL}/user/one?id=${user_id}">Click here to view user</a>
 							</h5>
-							<br><br>
-						
-							<p>if you didn't initiate this request, please ignore this mail, or contact Admin for further support</p>
+							<br><br>						
             			</div>
             		</td>
             	</tr>

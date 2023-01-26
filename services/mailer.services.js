@@ -13,7 +13,7 @@ let transporter = nodemailer.createTransport({
 
 const sendMail = (mailOptions) => {
     transporter.sendMail({
-            from: `"Gloed - hi@gloed.co `,
+            from: `"Gloed.co" ${process.env.MAIL_USER}`,
             to: mailOptions.to,
             subject: mailOptions.subject || "No Subject",
             html: mailOptions.html,

@@ -78,7 +78,7 @@ module.exports = {
                     const mailOptions = {
                         to: admin.email,
                         subject: "New Registration Mail",
-                        html: newUserMail(user.fullname, user._id, admin.fullname),
+                        html: newUserMail(user.firstName, user._id, admin.firstName),
                     };
 
                     sendMail(mailOptions);

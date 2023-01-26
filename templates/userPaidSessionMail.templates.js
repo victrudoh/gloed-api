@@ -359,7 +359,7 @@ ul.social li{
 							<br>
 							<b>Class: </b> ${course} 
 							<br>
-							<b>Date/Time: </b>${date.splice(0, 12)}
+							<b>Date/Time: </b>${date}
 							<br><br>
 							<h4> Best Regards, Team Gloed</h4>
 							<br><br>

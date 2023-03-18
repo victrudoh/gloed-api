@@ -529,7 +529,7 @@ module.exports = {
               newSession.fullName,
               newSession.course,
               newSession.dateTime,
-              admin.fullName
+              admin.firstName
             ),
           };
           sendMail(mailOptions);

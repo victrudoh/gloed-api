@@ -11,6 +11,7 @@ const tx_ref = require("../middlewares/tx_ref");
 // Services
 const FLW_services = require("../services/flutterwave.services");
 const sendMail = require("../services/mailer.services");
+const monnify = require("../services/monnify.services");
 
 // templates
 const adminPaidSessionMail = require("../templates/adminPaidSessionMail.templates");
@@ -123,26 +124,37 @@ module.exports = {
       const newAmount = parseInt(req.body.amount);
       const transREf = tx_ref.get_Tx_Ref();
 
+      // const payload = {
+      //   tx_ref: transREf,
+      //   amount: newAmount,
+      //   currency: currency,
+      //   payment_options: "card",
+      //   redirect_url: "https://topapp.ng/utility/verify",
+      //   customer: {
+      //     email: user.email,
+      //     phonenumber: user.phone,
+      //     name: `${user.firstName} ${user.lastName}`,
+      //   },
+      //   meta: {
+      //     customer_id: userId,
+      //   },
+      //   customizations: {
+      //     title: "Gloed",
+      //     description: "Pay with card",
+      //     logo: "#",
+      //   },
+      // };
+
       const payload = {
-        tx_ref: transREf,
         amount: newAmount,
-        currency: currency,
-        payment_options: "card",
-        redirect_url: "https://topapp.ng/utility/verify",
-        customer: {
-          email: user.email,
-          phonenumber: user.phone,
-          name: `${user.firstName} ${user.lastName}`,
-        },
-        meta: {
-          customer_id: userId,
-        },
-        customizations: {
-          title: "Gloed",
-          description: "Pay with card",
-          logo: "#",
-        },
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        description: "Payment for GLOED session",
+        tx_ref: transREf,
       };
+
+      const token = await monnify.obtainAccessToken();
+      const response = await monnify.initializePayment(payload, token);
 
       const newSession = new Session({
         userId,
@@ -152,6 +164,8 @@ module.exports = {
         comment,
         meetingType,
         tx_ref: transREf,
+        transactionReference: response.transactionReference,
+        paymentReference: response.paymentReference,
         dateTime: new Date(dateTime),
       });
       await newSession.save();
@@ -177,14 +191,14 @@ module.exports = {
         });
       }
 
-      const response = await FLW_services.initiateTransaction(payload);
+      // const response = await FLW_services.initiateTransaction(payload);
 
       return res.status(200).send({
         success: true,
         message: "created new sesssion successfully",
         data: {
           session: newSession,
-          url: response,
+          url: response.checkoutUrl,
         },
       });
     } catch (err) {
@@ -245,84 +259,181 @@ module.exports = {
 
   // Verify payment
   getVerifyController: async (req, res, next) => {
+    // try {
+    //   const id = req.query.transaction_id;
+    //   const tx_ref = req.query.tx_ref;
+
+    //   const verify = await FLW_services.verifyTransaction(id);
+    //   console.log("getVerifyController:async ~ verify", verify);
+
+    //   if (verify.status === "successful") {
+    //     const session = await Session.findOne({ tx_ref: tx_ref });
+    //     console.log("session: ", session);
+
+    //     if (session) {
+    //       session.paid = true;
+    //       await session.save();
+
+    //       // Find all admins
+    //       const admins = await User.find({ role: "admin" });
+
+    //       // find user
+    //       const user = await User.findById({ _id: session.userId });
+    //       if (!user) return res.status(400).send("User not found");
+
+    //       //   send mail to all admins
+    //       if (admins) {
+    //         admins.map((admin) => {
+    //           // Send password to admin's email
+    //           const mailOptions = {
+    //             to: admin.email,
+    //             subject: "New Session Mail",
+    //             html: adminPaidSessionMail(
+    //               user.firstName,
+    //               session.course,
+    //               session.dateTime,
+    //               admin.firstName
+    //             ),
+    //           };
+    //           sendMail(mailOptions);
+    //         });
+    //       }
+
+    //       // Send password to user's email
+    //       const mailOptions = {
+    //         to: user.email,
+    //         subject: "New Session Mail",
+    //         html: adminPaidSessionMail(
+    //           user.firstName,
+    //           session.course,
+    //           session.dateTime
+    //         ),
+    //       };
+    //       sendMail(mailOptions);
+
+    //       //   const mailOptions = {
+    //       //     to: user.email,
+    //       //     subject: "Payment confirmation",
+    //       //     html: `Hello, You have successfully registered for your session, head to your dashboard to see your course schedule<br/> Thank you for choosing Gloed.`,
+    //       //   };
+
+    //       // await sendMail(mailOptions);
+
+    //       return res.status(200).send({
+    //         success: true,
+    //         data: {
+    //           session,
+    //         },
+    //         message: "transaction successful",
+    //       });
+    //     } else {
+    //       res.status(400).send({
+    //         success: false,
+    //         message: "Couldn't find session",
+    //       });
+    //     }
+    //   } else {
+    //     res.status(500).send({
+    //       success: false,
+    //       message: "Payment was not successful",
+    //     });
+    //   }
+    // } catch (err) {
+    //   console.log("EERROOOORR: ", err);
+    //   res.status(500).send({
+    //     success: false,
+    //     message: "Oops! Something is wrong",
+    //     errMessage: err.message,
+    //   });
+    // }
+
     try {
-      const id = req.query.transaction_id;
-      const tx_ref = req.query.tx_ref;
+      // Monnify
+      // Good ol' monnify
+      const paymentReference = req.query.paymentReference;
 
-      const verify = await FLW_services.verifyTransaction(id);
-      console.log("getVerifyController:async ~ verify", verify);
+      const session = await Session.findOne({
+        paymentReference: paymentReference,
+      });
+      console.log(
+        "🚀 ~ file: utils.controller.js:357 ~ getVerifyController: ~ session:",
+        session
+      );
 
-      if (verify.status === "successful") {
-        const session = await Session.findOne({ tx_ref: tx_ref });
-        console.log("session: ", session);
+      if (!session) {
+        return res.status(400).send({
+          success: false,
+          message: "session not found.",
+        });
+      }
 
-        if (session) {
-          session.paid = true;
-          await session.save();
+      const token = await monnify.obtainAccessToken();
+      const verify = await monnify.verifyPayment(
+        session.transactionReference,
+        token
+      );
 
-          // Find all admins
-          const admins = await User.find({ role: "admin" });
+      if (verify.paymentStatus === "PAID") {
+        // const session = await Session.findOne({ tx_ref: tx_ref });
+        // console.log("session: ", session);
 
-          // find user
-          const user = await User.findById({ _id: session.userId });
-          if (!user) return res.status(400).send("User not found");
+        // if (session) {
+        session.paid = true;
+        await session.save();
 
-          //   send mail to all admins
-          if (admins) {
-            admins.map((admin) => {
-              // Send password to admin's email
-              const mailOptions = {
-                to: admin.email,
-                subject: "New Session Mail",
-                html: adminPaidSessionMail(
-                  user.firstName,
-                  session.course,
-                  session.dateTime,
-                  admin.firstName
-                ),
-              };
-              sendMail(mailOptions);
-            });
-          }
+        // Find all admins
+        const admins = await User.find({ role: "admin" });
 
-          // Send password to user's email
-          const mailOptions = {
-            to: user.email,
-            subject: "New Session Mail",
-            html: adminPaidSessionMail(
-              user.firstName,
-              session.course,
-              session.dateTime
-            ),
-          };
-          sendMail(mailOptions);
+        // find user
+        const user = await User.findById({ _id: session.userId });
+        if (!user) return res.status(400).send("User not found");
 
-          //   const mailOptions = {
-          //     to: user.email,
-          //     subject: "Payment confirmation",
-          //     html: `Hello, You have successfully registered for your session, head to your dashboard to see your course schedule<br/> Thank you for choosing Gloed.`,
-          //   };
-
-          // await sendMail(mailOptions);
-
-          return res.status(200).send({
-            success: true,
-            data: {
-              session,
-            },
-            message: "transaction successful",
-          });
-        } else {
-          res.status(400).send({
-            success: false,
-            message: "Couldn't find session",
+        //   send mail to all admins
+        if (admins) {
+          admins.map((admin) => {
+            // Send password to admin's email
+            const mailOptions = {
+              to: admin.email,
+              subject: "New Session Mail",
+              html: adminPaidSessionMail(
+                user.firstName,
+                session.course,
+                session.dateTime,
+                admin.firstName
+              ),
+            };
+            sendMail(mailOptions);
           });
         }
-      } else {
-        res.status(500).send({
-          success: false,
-          message: "Payment was not successful",
+
+        // Send password to user's email
+        const mailOptions = {
+          to: user.email,
+          subject: "New Session Mail",
+          html: adminPaidSessionMail(
+            user.firstName,
+            session.course,
+            session.dateTime
+          ),
+        };
+        sendMail(mailOptions);
+
+        //   const mailOptions = {
+        //     to: user.email,
+        //     subject: "Payment confirmation",
+        //     html: `Hello, You have successfully registered for your session, head to your dashboard to see your course schedule<br/> Thank you for choosing Gloed.`,
+        //   };
+
+        // await sendMail(mailOptions);
+
+        return res.status(200).send({
+          success: true,
+          data: {
+            session,
+          },
+          message: "transaction successful",
         });
+        // }
       }
     } catch (err) {
       console.log("EERROOOORR: ", err);
@@ -479,27 +590,39 @@ module.exports = {
       const newAmount = parseInt(req.body.amount);
       const transREf = tx_ref.get_Tx_Ref();
 
+      // const payload = {
+      //   tx_ref: transREf,
+      //   amount: newAmount,
+      //   currency: currency,
+      //   payment_options: "card",
+      //   // redirect_url: "http://localhost:3000/payment-status",
+      //   redirect_url: "https://www.gloed.co/#/payment-status",
+      //   customer: {
+      //     email: email,
+      //     phonenumber: phone,
+      //     name: fullName,
+      //   },
+      //   meta: {
+      //     customer_id: transREf,
+      //   },
+      //   customizations: {
+      //     title: "Gloed",
+      //     description: "Pay with card",
+      //     logo: "#",
+      //   },
+      // };
+
       const payload = {
-        tx_ref: transREf,
         amount: newAmount,
-        currency: currency,
-        payment_options: "card",
-        // redirect_url: "http://localhost:3000/payment-status",
-        redirect_url: "https://www.gloed.co/#/payment-status",
-        customer: {
-          email: email,
-          phonenumber: phone,
-          name: fullName,
-        },
-        meta: {
-          customer_id: transREf,
-        },
-        customizations: {
-          title: "Gloed",
-          description: "Pay with card",
-          logo: "#",
-        },
+        name: fullName,
+        email: email,
+        description: "Payment for GLOED session",
+        tx_ref: transREf,
       };
+
+      // monnify
+      const token = await monnify.obtainAccessToken();
+      const response = await monnify.initializePayment(payload, token);
 
       const newSession = new WebSession({
         fullName,
@@ -510,6 +633,8 @@ module.exports = {
         comment,
         meetingType,
         tx_ref: transREf,
+        transactionReference: response.transactionReference,
+        paymentReference: response.paymentReference,
         amount,
         // dateTime: new Date(dateTime),
         dateTime,
@@ -536,14 +661,14 @@ module.exports = {
         });
       }
 
-      const response = await FLW_services.initiateTransaction(payload);
+      // const response = await FLW_services.initiateTransaction(payload);
 
       return res.status(200).send({
         success: true,
         message: "created new sesssion successfully",
         data: {
           session: newSession,
-          url: response,
+          url: response.checkoutUrl,
         },
       });
     } catch (err) {
@@ -561,71 +686,164 @@ module.exports = {
 
   // Verify payment
   getVerifyUnauthController: async (req, res, next) => {
+    // try {
+    //   const id = req.query.transaction_id;
+    //   const tx_ref = req.query.tx_ref;
+
+    //   const verify = await FLW_services.verifyTransaction(id);
+    //   console.log("getVerifyController:async ~ verify:", verify);
+
+    //   if (verify.status === "successful") {
+    //     const session = await WebSession.findOne({ tx_ref: tx_ref });
+    //     console.log("session: ", session);
+
+    //     if (session) {
+    //       session.paid = true;
+    //       await session.save();
+
+    //       // // Find all admins
+    //       // const admins = await User.find({ role: "admin" });
+
+    //       // //   send mail to all admins
+    //       // if (admins) {
+    //       //     admins.map((admin) => {
+    //       //         const mailOptions = {
+    //       //             to: admin.email,
+    //       //             subject: "Gloed Session Booking",
+    //       //             html: adminPaidSessionMail(
+    //       //                 session.fullName,
+    //       //                 session.course,
+    //       //                 session.dateTime,
+    //       //                 admin.fullName
+    //       //             ),
+    //       //         };
+    //       //         sendMail(mailOptions);
+    //       //     });
+    //       // }
+
+    //       // Send mail to user
+    //       const mailOptions = {
+    //         to: session.email,
+    //         subject: "Gloed Session Booking",
+    //         html: adminPaidSessionMail(
+    //           session.fullName,
+    //           session.course,
+    //           session.dateTime
+    //         ),
+    //       };
+    //       sendMail(mailOptions);
+
+    //       return res.status(200).send({
+    //         success: true,
+    //         data: {
+    //           session,
+    //         },
+    //         message: "transaction successful",
+    //       });
+    //     } else {
+    //       res.status(400).send({
+    //         success: false,
+    //         message: "Couldn't find session",
+    //       });
+    //     }
+    //   } else {
+    //     res.status(500).send({
+    //       success: false,
+    //       message: "Payment was not successful",
+    //     });
+    //   }
+    // } catch (err) {
+    //   console.log("EERROOOORR: ", err);
+    //   res.status(500).send({
+    //     success: false,
+    //     message: "Oops! Something is wrong",
+    //     errMessage: err.message,
+    //   });
+    // }
+
     try {
-      const id = req.query.transaction_id;
-      const tx_ref = req.query.tx_ref;
+      // Monnify
+      // Good ol' monnify
+      const paymentReference = req.query.paymentReference;
 
-      const verify = await FLW_services.verifyTransaction(id);
-      console.log("getVerifyController:async ~ verify:", verify);
+      const session = await WebSession.findOne({
+        paymentReference: paymentReference,
+      });
 
-      if (verify.status === "successful") {
-        const session = await WebSession.findOne({ tx_ref: tx_ref });
-        console.log("session: ", session);
+      if (!session) {
+        return res.status(400).send({
+          success: false,
+          message: "session not found.",
+        });
+      }
 
-        if (session) {
-          session.paid = true;
-          await session.save();
+      const token = await monnify.obtainAccessToken();
+      const verify = await monnify.verifyPayment(
+        session.transactionReference,
+        token
+      );
 
-          // // Find all admins
-          // const admins = await User.find({ role: "admin" });
+      if (verify.paymentStatus === "PAID") {
+        // const session = await WebSession.findOne({ tx_ref: tx_ref });
+        // console.log("session: ", session);
 
-          // //   send mail to all admins
-          // if (admins) {
-          //     admins.map((admin) => {
-          //         const mailOptions = {
-          //             to: admin.email,
-          //             subject: "Gloed Session Booking",
-          //             html: adminPaidSessionMail(
-          //                 session.fullName,
-          //                 session.course,
-          //                 session.dateTime,
-          //                 admin.fullName
-          //             ),
-          //         };
-          //         sendMail(mailOptions);
-          //     });
-          // }
+        // if (session) {
+        session.paid = true;
+        await session.save();
 
-          // Send mail to user
-          const mailOptions = {
-            to: session.email,
-            subject: "Gloed Session Booking",
-            html: adminPaidSessionMail(
-              session.fullName,
-              session.course,
-              session.dateTime
-            ),
-          };
-          sendMail(mailOptions);
+        // Find all admins
+        const admins = await User.find({ role: "admin" });
 
-          return res.status(200).send({
-            success: true,
-            data: {
-              session,
-            },
-            message: "transaction successful",
-          });
-        } else {
-          res.status(400).send({
-            success: false,
-            message: "Couldn't find session",
+        // find user
+        // const user = await User.findById({ _id: session.userId });
+        // if (!user) return res.status(400).send("User not found");
+
+        //   send mail to all admins
+        if (admins) {
+          admins.map((admin) => {
+            // Send password to admin's email
+            const mailOptions = {
+              to: admin.email,
+              subject: "New Session Mail",
+              html: adminPaidSessionMail(
+                session.fullName,
+                session.course,
+                session.dateTime,
+                admin.firstName
+              ),
+            };
+            sendMail(mailOptions);
           });
         }
-      } else {
-        res.status(500).send({
-          success: false,
-          message: "Payment was not successful",
+
+        // Send password to user's email
+        const mailOptions = {
+          to: session.email,
+          subject: "New Session Mail",
+          html: adminPaidSessionMail(
+            session.fullName,
+            session.course,
+            session.dateTime
+          ),
+        };
+        sendMail(mailOptions);
+
+        //   const mailOptions = {
+        //     to: user.email,
+        //     subject: "Payment confirmation",
+        //     html: `Hello, You have successfully registered for your session, head to your dashboard to see your course schedule<br/> Thank you for choosing Gloed.`,
+        //   };
+
+        // await sendMail(mailOptions);
+
+        return res.status(200).send({
+          success: true,
+          data: {
+            session,
+          },
+          message: "transaction successful",
         });
+        // }
       }
     } catch (err) {
       console.log("EERROOOORR: ", err);
